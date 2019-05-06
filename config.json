@@ -11,5 +11,11 @@
     "jwt": {
         "secret": "a0#4dA02",
         "session_duration": 14
+    },
+    "rabbitmq": {
+        "username": "guest",
+        "password": "guest",
+        "host": "localhost",
+        "port": "5672"
     }
 }

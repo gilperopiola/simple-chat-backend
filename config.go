@@ -25,6 +25,12 @@ type MyConfig struct {
 		SECRET           string
 		SESSION_DURATION int
 	}
+	RABBITMQ struct {
+		USERNAME string
+		PASSWORD string
+		HOST     string
+		PORT     string
+	}
 }
 
 func (config *MyConfig) Setup() {

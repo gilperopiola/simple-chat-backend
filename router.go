@@ -26,12 +26,12 @@ func (router *MyRouter) Setup() {
 	}))
 
 	router.POST("/login", LogIn)
-
 	authorized := router.Group("/", validateToken())
 	{
 		authorized.GET("user/:id", GetUser, validateToken())
 		authorized.GET("rooms", GetRooms, validateToken())
 		authorized.GET("room/:id", GetRoomMessages, validateToken())
 		authorized.POST("room/:id", PostMessage, validateToken())
+		authorized.POST("command", ExecuteCommand, validateToken())
 	}
 }

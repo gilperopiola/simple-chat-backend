@@ -13,6 +13,7 @@ type DatabaseActions interface {
 	Setup()
 	Migrate()
 	Seed()
+	Purge()
 }
 
 type MyDatabase struct {
@@ -29,7 +30,6 @@ func (database *MyDatabase) Setup() {
 	}
 
 	database.Migrate()
-	//database.Seed()
 }
 
 func (database *MyDatabase) Migrate() {
@@ -39,10 +39,26 @@ func (database *MyDatabase) Migrate() {
 }
 
 func (database *MyDatabase) Seed() {
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 10; i++ {
 		database.Create(&User{Username: "test_username_" + strconv.Itoa(i), Password: hash("test_username_"+strconv.Itoa(i), "password")})
 		database.Create(&Room{})
 	}
+}
+
+func (database *MyDatabase) Purge() {
+	database.Delete(User{})
+	database.Delete(Room{})
+	database.Delete(Message{})
+}
+
+func (database *MyDatabase) GetTestingData() (User, Room) {
+	var users []User
+	database.Find(&users)
+
+	var rooms []Room
+	database.Find(&rooms)
+
+	return users[0], rooms[0]
 }
 
 func (database *MyDatabase) BeautifyError(err error) string {

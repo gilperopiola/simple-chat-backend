@@ -20,19 +20,36 @@ type Message struct {
 	Data   string `json:"data" gorm:"not_null"`
 }
 
-func GetRoomMessages(c *gin.Context) {
-	roomID := c.Param("id")
-	since := c.Query("since")
-
-	var messages []Message
-	database.Where("id > " + since + " AND room_id = " + roomID).Find(&messages)
-	c.JSON(http.StatusOK, messages)
-}
-
 func GetRooms(c *gin.Context) {
 	var rooms []Room
 	database.Find(&rooms)
 	c.JSON(http.StatusOK, rooms)
+}
+
+func GetRoomMessages(c *gin.Context) {
+	roomID := c.Param("id")
+	since := c.Query("since")
+
+	if since == "" {
+		since = "0"
+	}
+
+	var messages []Message
+	database.Where("id > " + since + " AND room_id = " + roomID).Order("id desc").Find(&messages)
+
+	//gets the creator of the messages
+	for i := 0; i < len(messages); i++ {
+		var user User
+		if err := database.First(&user, messages[i].UserID).Error; err != nil {
+			c.JSON(http.StatusBadRequest, database.BeautifyError(err))
+			return
+		}
+		user.Password = ""
+		messages[i].User = &user
+		messages[i].UserID = 0
+	}
+
+	c.JSON(http.StatusOK, messages)
 }
 
 func PostMessage(c *gin.Context) {

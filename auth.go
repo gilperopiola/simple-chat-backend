@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -75,6 +76,19 @@ func generateToken(user User) string {
 		Audience:  user.Username,
 		IssuedAt:  time.Now().Unix(),
 		ExpiresAt: time.Now().Add(time.Hour * 24 * time.Duration(config.JWT.SESSION_DURATION)).Unix(),
+	})
+	tokenString, _ := token.SignedString([]byte(config.JWT.SECRET))
+	return tokenString
+}
+
+func generateTestingToken() string {
+	user, _ := database.GetTestingData()
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Id:        strconv.Itoa(int(user.ID)),
+		Audience:  user.Username,
+		IssuedAt:  time.Now().Unix(),
+		ExpiresAt: time.Now().Add(time.Minute).Unix(),
 	})
 	tokenString, _ := token.SignedString([]byte(config.JWT.SECRET))
 	return tokenString
